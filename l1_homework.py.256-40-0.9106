@@ -1,0 +1,29 @@
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import Adam
+
+model = Sequential()
+
+model.add(Dense(4096, input_shape=(784,), activation='relu', kernel_initializer='he_uniform'))
+model.add(Dropout(0.7))
+#model.add(Dense(64, activation='tanh', kernel_initializer='glorot_uniform'))
+#model.add(Dropout(0.3))
+model.add(Dense(10, activation='softmax'))
+
+model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+, metrics=['accuracy'])
+hist=model.fit(x_train, y_train, batch_size=256, epochs=40, validation_split=0.1)
+
+pred_y = model.predict(x_test)
+pred_y = np.argmax(pred_y, 1)
+    
+submission = pd.Series(pred_y, name='label')
+submission.to_csv('/root/userspace/submission.csv', header=True, index_label='id')
+
+import matplotlib.pyplot as plt
+%matplotlib inline
+plt.plot(hist.history["acc"])
+plt.plot(hist.history["val_acc"])
+plt.title("Accuracy")
+plt.legend(['train',"val"])
+plt.show
